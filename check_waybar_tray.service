@@ -3,5 +3,5 @@ Description=Run python script to check which process owns org.kde.StatusNotfierW
 
 [Service]
 Type=oneshot
-# Edit the following line to point to the right FULL path of the python3 executable and the python file.
+# Edit the following line to point to the right path of the python file.
 ExecStart=python3 %h/Documents/check_waybar_tray/check_waybar_tray.py
