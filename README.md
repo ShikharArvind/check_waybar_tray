@@ -5,12 +5,37 @@ A simple python 3 script and systemd service file to check if waybar is connecte
 _This script is highly experimental and may be unstable or unreliable. Before using this script, ensure you have taken appropriate measures to safeguard your data and systems, such as creating backups and testing in a controlled environment. Proceed with caution and use at your own discretion._
 
 ## Info
-- There are three files : a python script `check_waybar_tray.py` and systemd system template unit `check_waybar_tray@.service` and a systemd user service file `check_waybar_tray.service`
 - `check_waybar_tray.py` : Python script which first checks if waybar is running. If waybar is running, then it check for the owner/connected process of `org.kde.StatusNotifierWatcher` D-bus service. If the process is not `waybar`, then it kills the process owning (or connected to) `org.kde.StatusNotifierWatcher`.
-- `check_waybar_tray@.service` : Template service file that acts a proxy to run the user service file after suspend resume. We need this as we are using `suspend.target`, which further calls `sleep.target` which is specific to system services [Ref 1]. If `check_waybar_tray.py` is directly called from this service, its runs with root privilege which causes an issue with getting the SessionBus [Ref 4]. To circumvent this, we can either run the python script as root and then use `setuid` to target user UID and then call  `dbus.bus.BusConnection` with the socket address for the target user, or we can create a proxy template service file which furthers calles a user service file [Ref 4]. The latter approach has been used here. 
+
+- `check_waybar_tray_v2.py` : Same python script, except it logs locally to a logs.txt file and also to the journalctl. This will be used with `swayidle`. With the `after-resume` option we can execute the script. It is much more cleaner and simpler that using the systemd services.
+
+- `check_waybar_tray@.service` : Template service file that acts a proxy to run the user service file after suspend resume. We need this as we are using `suspend.target`, which further calls `sleep.target` which is specific to system services [Ref 1]. If `check_waybar_tray.py` is directly called from this service, its runs with root privilege which causes an issue with getting the SessionBus [Ref 4]. To circumvent this, we can either run the python script as root and then use `setuid` to target user UID and then call  `dbus.bus.BusConnection` with the socket address for the target user, or we can create a proxy template service file which furthers calls a user service file [Ref 4]. The latter approach has been used here. 
 - `check_waybar_tray.service` : User service that runs the `check_waybar_tray.py`.
 
-## Installation
+## Installation (if using `swayidle`)
+1. Clone the git repository anywhere you want. Lets assume it is /home/_USER_/Documents, where USER is your username.
+```
+cd ~/Documents/
+git clone https://github.com/ShikharArvind/check_waybar_tray.git
+```
+2. Install the required python3 packages : `systemd-python`, `dbus-python`, `psutils`. For Arch users, all are available in the repo, install them from there and not pip. 
+3. Test run the python file to see if everything is working fine.
+```
+cd ~/Documents/check_waybar_tray
+python3 check_waybar_tray.py
+```
+4. Append the python script to swayidle options. For me, it's in my sway config as follows : 
+```
+exec swayidle -w \
+            timeout 1200 'hyprlock --quiet --immediate' \
+            before-sleep 'hyprlock --quiet --immediate' \
+            after-resume 'exec python3 ~/Documents/check_waybar_tray/check_waybar_tray_v2.py'
+```
+5. Supend, resume and check the `logs.txt` in the local directory and/or journalctl to make sure the script is working as intended. 
+6. Might be also possible on other Idle daemons like `hypridle` , but have not personally tested it. 
+
+
+## Installation (using the systemd service)
 1. Clone the git repository anywhere you want. Lets assume it is /home/_USER_/Documents, where USER is your username.
 ```
 cd ~/Documents/
