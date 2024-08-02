@@ -19,20 +19,29 @@ cd ~/Documents/
 git clone https://github.com/ShikharArvind/check_waybar_tray.git
 ```
 2. Install the required python3 packages : `systemd-python`, `dbus-python`, `psutils`. For Arch users, all are available in the repo, install them from there and not pip. 
-3. Test run the python file to see if everything is working fine.
+3. Update the `check_waybar_tray_v2.py` logs file path in the following section :
+```
+# Configure logging
+logging.basicConfig(
+    filename='/home/shikhar/Documents/check_waybar_tray/logs.txt', # UPDATE THE PATH ACCORDINGLY, Need to use full path or else when calling from swayidle, it will log elsewhere. 
+
+)
+```
+
+4. Test run the python file to see if everything is working fine.
 ```
 cd ~/Documents/check_waybar_tray
-python3 check_waybar_tray.py
+python3 check_waybar_tray_v2.py
 ```
-4. Append the python script to swayidle options. For me, it's in my sway config as follows : 
+5. Append the python script to swayidle options. For me, it's in my sway config as follows : 
 ```
 exec swayidle -w \
             timeout 1200 'hyprlock --quiet --immediate' \
             before-sleep 'hyprlock --quiet --immediate' \
             after-resume 'exec python3 ~/Documents/check_waybar_tray/check_waybar_tray_v2.py'
 ```
-5. Supend, resume and check the `logs.txt` in the local directory and/or journalctl to make sure the script is working as intended. 
-6. Might be also possible on other Idle daemons like `hypridle` , but have not personally tested it. 
+6. Supend, resume and check the `logs.txt` in the local directory and/or journalctl to make sure the script is working as intended. 
+7. Might be also possible on other Idle daemons like `hypridle` , but have not personally tested it. 
 
 
 ## Installation (using the systemd service)
