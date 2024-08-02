@@ -1,0 +1,9 @@
+[Unit]
+Description=System service to start the user service "check_waybar_tray.service" after system resume.
+After=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
+[Service]
+#Added delay, else dbus-python throws org.freedesktop.DBus.Error.NameHasNoOwner
+ExecStartPre=/bin/sleep 10 
+ExecStart=/usr/bin/systemctl --user --machine=%i@ start --wait check_waybar_tray.service
+[Install]
+WantedBy=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
