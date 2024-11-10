@@ -1,4 +1,7 @@
 # check_waybar_tray
+
+## UPDATE :  Refer [here](https://github.com/Alexays/Waybar/issues/3468#issuecomment-2449238485) for a newer solution for this issue.
+
 A simple python 3 script and systemd service file to check if waybar is connected to org.kde.StatusNotifierWatcher. Refer  [#3468 issue](https://github.com/Alexays/Waybar/issues/3468#issuecomment-2262074645) for more background information. 
 
 ## WARNING 
